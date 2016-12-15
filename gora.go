@@ -1,17 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"time"
+  "fmt"
+  "time"
   "flag"
-	"net/http"
+  "net/http"
   "strconv"
 )
 
 func strfNow() string {
-	now:= time.Now()
-	const layout = "2006-01-02 15:04:05"
-	return now.Format(layout)
+  now:= time.Now()
+  const layout = "2006-01-02 15:04:05"
+  return now.Format(layout)
 }
 
 func suffix(iter int, length int) string {
@@ -23,21 +23,21 @@ func suffix(iter int, length int) string {
 }
 
 func writeHeaders(w http.ResponseWriter, headers http.Header) {
-	fmt.Fprint(w, "\"headers\":{\n")
+  fmt.Fprint(w, "\"headers\":{\n")
   iter, length := 0, len(headers)
-	for key, value := range headers {
+  for key, value := range headers {
     iter++
-		fmt.Fprintf(w, "\"" + key + "\":\"" + value[0] + "\"" + suffix(iter, length))
-	}
+    fmt.Fprintf(w, "\"" + key + "\":\"" + value[0] + "\"" + suffix(iter, length))
+  }
   fmt.Fprint(w, "}")
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "{\"time\" : \"" + strfNow() + "\",\n")
+  fmt.Fprintf(w, "{\"time\" : \"" + strfNow() + "\",\n")
 
-	writeHeaders(w, r.Header)
+  writeHeaders(w, r.Header)
 
-	fmt.Fprint(w, "}")
+  fmt.Fprint(w, "}")
 }
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
   http.HandleFunc("/gora/", handler)
 
   err := http.ListenAndServe(":" + strconv.Itoa(*port), nil)
-	if err != nil {
-		fmt.Println(err)
-	}
+  if err != nil {
+    fmt.Println(err)
+  }
 }
