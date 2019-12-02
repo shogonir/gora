@@ -1,54 +1,59 @@
 package main
 
 import (
-  "fmt"
-  "time"
-  "flag"
-  "net/http"
-  "strconv"
+	"flag"
+	"fmt"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 func strfNow() string {
-  now:= time.Now()
-  const layout = "2006-01-02 15:04:05"
-  return now.Format(layout)
+	now := time.Now()
+	const layout = "2006-01-02 15:04:05"
+	return now.Format(layout)
 }
 
 func suffix(iter int, length int) string {
-  if (iter == length) {
-    return "\n"
-  } else {
-    return ",\n"
-  }
+	if iter == length {
+		return "\n"
+	} else {
+		return ",\n"
+	}
 }
 
-func writeHeaders(w http.ResponseWriter, headers http.Header) {
-  fmt.Fprint(w, "\"headers\":{\n")
-  iter, length := 0, len(headers)
-  for key, value := range headers {
-    iter++
-    fmt.Fprintf(w, "\"" + key + "\":\"" + value[0] + "\"" + suffix(iter, length))
-  }
-  fmt.Fprint(w, "}")
+func displayHeaders(headers http.Header) {
+	fmt.Println("\"headers\": {")
+	iter, length := 0, len(headers)
+	for key, value := range headers {
+		iter++
+		fmt.Printf("    \"" + key + "\":\"" + value[0] + "\"" + suffix(iter, length))
+	}
+	fmt.Println("}")
+	fmt.Println()
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
-  fmt.Fprintf(w, "{\"time\" : \"" + strfNow() + "\",\n")
+	fmt.Println(strfNow() + " " + r.RequestURI)
 
-  writeHeaders(w, r.Header)
+	displayHeaders(r.Header)
 
-  fmt.Fprint(w, "}")
+	fmt.Fprint(w, "ok")
 }
 
 func main() {
 
-  port := flag.Int("port", 7999, "listen port number")
-  flag.Parse()
+	port := flag.Int("port", 7999, "listen port number")
+	flag.Parse()
 
-  http.HandleFunc("/gora/", handler)
+	fmt.Println()
+	fmt.Println("'gora' has started.")
+	fmt.Printf("listening: ':%d/gora/*'\n\n", *port)
 
-  err := http.ListenAndServe(":" + strconv.Itoa(*port), nil)
-  if err != nil {
-    fmt.Println(err)
-  }
+	http.HandleFunc("/gora/", handler)
+
+	err := http.ListenAndServe(":"+strconv.Itoa(*port), nil)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
